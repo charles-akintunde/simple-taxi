@@ -1,0 +1,28 @@
+# Node.js related
+**/node_modules
+user-service/node_modules
+npm-debug.log
+yarn-error.log
+
+# TypeScript related
+dist/
+*.tsbuildinfo
+
+# Environment variables
+.env
+
+# Editor related
+.vscode/
+*.log
+*.swp
+*.swo
+*.idea/
+*.DS_Store
+
+# OS related
+Thumbs.db
+.DS_Store
+
+# Other
+*.bak
+*.tmp
