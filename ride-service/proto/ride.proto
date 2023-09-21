@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+service RideService {
+  rpc BookRide (RideRequest) returns (RideResponse);
+  rpc StartRide (RideRequest) returns (RideResponse);
+  rpc CompleteRide (RideRequest) returns (RideResponse);
+  rpc GetRideStatus (RideRequest) returns (RideResponse);
+}
+
+message RideRequest {
+  int32 userId = 1;
+  int32 driverId = 2;
+  float startLatitude = 3;
+  float startLongitude = 4;
+  float endLatitude = 5;
+  float endLongitude = 6;
+}
+
+message RideResponse {
+  bool success = 1;
+  string message = 2;
+  string status = 3;  // 'PENDING', 'ONGOING', 'COMPLETED'
+  Error error = 4;
+}
+
+message Error {
+  int32 code = 1;
+  string message = 2;
+}
