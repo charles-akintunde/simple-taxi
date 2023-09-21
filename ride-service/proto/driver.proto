@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+service DriverService {
+  rpc RegisterDriver (DriverRequest) returns (DriverResponse);
+  rpc UpdateLocation (LocationRequest) returns (DriverResponse);
+  rpc GetDriver (DriverRequest) returns (DriverResponse);
+  rpc LoginDriver (DriverRequest) returns (DriverResponse);
+}
+
+message DriverRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LocationRequest {
+  string email = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message DriverResponse {
+  bool success = 1;
+  string message = 2;
+  string token = 3;
+  Driver driverDetails = 4;
+}
+
+message Driver {
+  int32 id = 1;
+  string email = 2;
+  double latitude = 3;
+  double longitude = 4;
+  string created_at = 5;
+}
+
+message Error {
+  int32 code = 1;
+  string message = 2;
+}
