@@ -1,15 +1,31 @@
-// app.ts
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import path from 'path';
+import * as driverController from "./controllers/driverControllers"
 
-import express from 'express';
-import driverRoutes from './routes/driverRoutes';
+const packageDefinition = protoLoader.loadSync(
+  path.join(__dirname, '..', 'proto', 'driver.proto'),
+  {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true
+  }
+);
 
+const driverProto = grpc.loadPackageDefinition(packageDefinition) as any;
 
-const app = express();
+const server = new grpc.Server();
 
-app.use(express.json());
-app.use('/driver', driverRoutes);
+server.addService(driverProto.DriverService.service, {
+    RegisterDriver: driverController.registerDriver,
+    LoginDriver: driverController.loginDriver,
+    UpdateLocation: driverController.updateLocation,
+    GetDriver: driverController.getDriver
+});
 
-
-app.listen(3001, () => {
-    console.log('Server is running on port 3001');
+server.bindAsync('127.0.0.1:50052', grpc.ServerCredentials.createInsecure(), () => {
+    console.log('Driver Service running on http://127.0.0.1:50052');
+    server.start();
 });

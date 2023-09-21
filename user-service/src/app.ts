@@ -1,13 +1,42 @@
-// app.ts
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import path from 'path';
+import * as userController from './controllers/userController';
 
-import express from 'express';
-import userRoutes from './routes/userRoutes';
+// Load the proto file
+const packageDefinition = protoLoader.loadSync(
+  path.join(__dirname, '..', 'proto', 'user.proto'),
+  {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true
+  }
+);
 
-const app = express();
+// Define the UserService interface for TypeScript
+interface IUserService {
+    RegisterUser: grpc.handleUnaryCall<any, any>;
+    LoginUser: grpc.handleUnaryCall<any, any>;
+    GetUser: grpc.handleUnaryCall<any, any>;
+}
 
-app.use(express.json());
-app.use('/user', userRoutes);
+// Load the package definition and cast it to any to bypass TypeScript's strict type checking
+const userProto = grpc.loadPackageDefinition(packageDefinition) as any;
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+// Create a new gRPC server
+const server = new grpc.Server();
+
+// Add the UserService to the server
+server.addService(userProto.UserService.service, {
+    RegisterUser: userController.registerUser,
+    LoginUser: userController.loginUser,
+    GetUser: userController.getUser
+});
+
+// Bind the server to a specific IP and port and start it
+server.bindAsync('127.0.0.1:50051', grpc.ServerCredentials.createInsecure(), () => {
+    console.log('Server running on http://127.0.0.1:50051');
+    server.start();
 });
