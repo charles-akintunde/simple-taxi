@@ -3,8 +3,14 @@ syntax = "proto3";
 service DriverService {
   rpc RegisterDriver (DriverRequest) returns (DriverResponse);
   rpc UpdateLocation (LocationRequest) returns (DriverResponse);
-  rpc GetDriver (DriverRequest) returns (DriverResponse);
+  rpc GetDriver (GetDriverRequest) returns (DriverResponse);
   rpc LoginDriver (DriverRequest) returns (DriverResponse);
+}
+
+
+message GetDriverRequest {
+  int32 id = 1;
+  string email = 2;
 }
 
 message DriverRequest {

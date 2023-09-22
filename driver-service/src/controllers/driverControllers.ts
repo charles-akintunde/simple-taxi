@@ -19,11 +19,20 @@ export const registerDriver = async (call: any, callback: any) => {
 
   export const getDriver = async (call: any, callback: any) => {
     try {
-      const { email } = call.request;
-      const result = await db.query('SELECT * FROM drivers WHERE email = $1', [email]);
+      const { id, email } = call.request;
+  
+      if (!id || !email) {
+        throw new Error('Both id and email must be provided');
+      }
+  
+      const query = 'SELECT * FROM drivers WHERE id = $1 AND email = $2';
+      const params = [id, email];
+  
+      const result = await db.query(query, params);
       if (result.rowCount === 0) {
         throw new Error('Driver not found');
       }
+  
       const driver = result.rows[0];
       const driverDetails = {
         id: driver.id,
@@ -40,6 +49,7 @@ export const registerDriver = async (call: any, callback: any) => {
       });
     }
   };
+  
 
   export const updateLocation = async (call: any, callback: any) => {
     try {

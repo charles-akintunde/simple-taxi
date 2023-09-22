@@ -1,25 +1,35 @@
 syntax = "proto3";
 
 service RideService {
-  rpc BookRide (RideRequest) returns (RideResponse);
+  rpc BookRide (BookRideRequest) returns (RideResponse);
   rpc StartRide (RideRequest) returns (RideResponse);
   rpc CompleteRide (RideRequest) returns (RideResponse);
   rpc GetRideStatus (RideRequest) returns (RideResponse);
 }
 
+message BookRideRequest {
+  int32 userId = 1;
+  int32 driverId = 2;
+  string userEmail = 3;
+  string driverEmail = 4;
+  float startLatitude = 5;
+  float startLongitude = 6;
+  float endLatitude = 7;
+  float endLongitude = 8;
+}
+
 message RideRequest {
   int32 userId = 1;
   int32 driverId = 2;
-  float startLatitude = 3;
-  float startLongitude = 4;
-  float endLatitude = 5;
-  float endLongitude = 6;
+  int32 rideId = 3;
+  string userEmail = 4;
+  string driverEmail = 5;
 }
 
 message RideResponse {
   bool success = 1;
   string message = 2;
-  string status = 3;  // 'PENDING', 'ONGOING', 'COMPLETED'
+  string status = 3; 
   Error error = 4;
 }
 

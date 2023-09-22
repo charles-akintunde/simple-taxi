@@ -4,7 +4,7 @@ import path from 'path';
 import * as rideController from './controllers/rideController';
 
 const packageDefinition = protoLoader.loadSync(
-    path.join(__dirname, 'proto', 'ride.proto'),
+    path.join(__dirname,'..','proto','ride.proto'),
     {
         keepCase: true,
         longs: String,

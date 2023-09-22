@@ -44,14 +44,25 @@ export const loginUser = async (call: any, callback: any) => {
 
 export const getUser = async (call: any, callback: any) => {
   try {
-    const { email } = call.request;
-    const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    const { id, email } = call.request;
+
+    if (!id || !email) {
+      throw new Error('Both id and email must be provided');
+    }
+
+    const query = 'SELECT * FROM users WHERE id = $1 AND email = $2';
+    const params = [id, email];
+
+    const result = await db.query(query, params)
     if (result.rowCount === 0) {
       throw new Error('User not found');
     }
+
     const user = result.rows[0];
-    const userDetails = {id: user.id, email: user.email}
-    callback(null, { success: true, message: 'User details fetched', userDetails  });
+    console.log(user,"USERDETAILS")
+    const userDetails = { id: user.id, email: user.email };
+
+    callback(null, { success: true, message: 'User details fetched', userDetails });
   } catch (error: any) {
     callback({
       code: 500,

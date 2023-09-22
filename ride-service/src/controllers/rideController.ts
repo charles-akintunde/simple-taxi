@@ -4,10 +4,10 @@ import { getDriverByEmail } from '../clients/driver-service-client'
 
 export const bookRide = async (call: any, callback: any) => {
     try {
-        const { userId, driverId, startLatitude, startLongitude, endLatitude, endLongitude } = call.request;
+        const { userId, driverId, userEmail, driverEmail, startLatitude, startLongitude, endLatitude, endLongitude } = call.request;
         
-        const user = await getUserByEmail(userId);
-        const driver = await getDriverByEmail(driverId);
+        const user = await getUserByEmail(userId,userEmail);
+        const driver = await getDriverByEmail(driverId,driverEmail);
 
         if (!user || !driver) {
             throw new Error('User or Driver not found');
@@ -26,16 +26,21 @@ export const bookRide = async (call: any, callback: any) => {
 
 export const startRide = async (call: any, callback: any) => {
     try {
-        const { userId, driverId } = call.request;
+        const { userId, driverId, userEmail, driverEmail, rideId} = call.request;
 
-        const user = await getUserByEmail(userId);
-        const driver = await getDriverByEmail(driverId);
+        const user = await getUserByEmail(userId,userEmail);
+        const driver = await getDriverByEmail(driverId,driverEmail);
+        const ride =  await db.query('SELECT status FROM rides WHERE id = $1', [rideId]);
 
         if (!user || !driver) {
             throw new Error('User or Driver not found');
         }
 
-        await db.query("UPDATE rides SET status = 'ONGOING' WHERE user_id = $1 AND driver_id = $2", [userId, driverId]);
+        if (!ride) {
+            throw new Error('Ride not found')
+        }
+
+        await db.query("UPDATE rides SET status = 'ONGOING' WHERE user_id = $1 AND driver_id = $2 and id = $3", [userId, driverId, rideId]);
 
 
         callback(null, { success: true, message: 'Ride started successfully', status: 'ONGOING' });
@@ -49,16 +54,20 @@ export const startRide = async (call: any, callback: any) => {
 
 export const completeRide = async (call: any, callback: any) => {
     try {
-        const { userId, driverId } = call.request;
+        const { userId, driverId, userEmail, driverEmail, rideId } = call.request;
 
-        const user = await getUserByEmail(userId);
-        const driver = await getDriverByEmail(driverId);
+        const user = await getUserByEmail(userId,userEmail);
+        const driver = await getDriverByEmail(driverId,driverEmail);
+        const ride =  await db.query('SELECT status FROM rides WHERE id = $1', [rideId]);
 
         if (!user || !driver) {
             throw new Error('User or Driver not found');
         }
 
-        await db.query("UPDATE rides SET status = 'COMPLETED' WHERE user_id = $1 AND driver_id = $2", [userId, driverId]);
+        if (!ride) {
+            throw new Error('Ride not found')}
+
+        await db.query("UPDATE rides SET status = 'COMPLETED' WHERE user_id = $1 AND driver_id = $2 AND id = $3", [userId, driverId,rideId]);
 
         callback(null, { success: true, message: 'Ride completed successfully', status: 'COMPLETED' });
     } catch (error: any) {
@@ -71,16 +80,16 @@ export const completeRide = async (call: any, callback: any) => {
 
 export const getRideStatus = async (call: any, callback: any) => {
     try {
-        const { userId, driverId } = call.request;
+        const { userId, driverId, userEmail, driverEmail, rideId} = call.request;
 
-        const user = await getUserByEmail(userId);
-        const driver = await getDriverByEmail(driverId);
+        const user = await getUserByEmail(userId,userEmail);
+        const driver = await getDriverByEmail(driverId,driverEmail);
 
         if (!user || !driver) {
             throw new Error('User or Driver not found');
         }
 
-        const result = await db.query('SELECT status FROM rides WHERE user_id = $1 AND driver_id = $2', [userId, driverId]);
+        const result = await db.query('SELECT status FROM rides WHERE user_id = $1 AND driver_id = $2 and id = $3', [userId, driverId, rideId]);
 
         if (result.rowCount === 0) {
             throw new Error('Ride not found');

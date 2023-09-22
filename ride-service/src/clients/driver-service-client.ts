@@ -3,7 +3,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import path from 'path';
 
 const packageDefinition = protoLoader.loadSync(
-    path.join(__dirname, '..', 'proto', 'driver.proto'),
+    path.join(__dirname, '..', '..','proto', 'driver.proto'),
     {
         keepCase: true,
         longs: String,
@@ -17,9 +17,9 @@ const driverProto = grpc.loadPackageDefinition(packageDefinition) as any;
 
 const client = new driverProto.DriverService('localhost:50052', grpc.credentials.createInsecure());
 
-export const getDriverByEmail = (email: string) => {
+export const getDriverByEmail = (driverId: any,driverEmail: any) => {
     return new Promise((resolve, reject) => {
-        client.GetDriver({ email }, (error, response) => {
+        client.GetDriver({  id: driverId, email: driverEmail }, (error: any, response: any) => {
             if (error) {
                 reject(error);
             } else {
